@@ -20,7 +20,7 @@ async function main(): Promise<void> {
   const refCode = await prompt(chalk.yellow("Enter Referral Code: "));
   const count = parseInt(await prompt(chalk.yellow("How many do you want? ")));
   const captchaMethod = await prompt(
-    chalk.yellow(`Choose Captcha Metode \n1.2Captcha\n2.Puppeteer (Free)\n3.Anti Captcha\nEnter Number: `)
+    chalk.yellow(`Choose Captcha Method \n1.2Captcha\n2.Puppeteer (Free)\n3.Anti Captcha\nEnter Number: `)
   );
   const proxiesLoaded = loadProxies();
   if (!proxiesLoaded) {
@@ -70,9 +70,9 @@ async function main(): Promise<void> {
     }
   } finally {
     sosoValueaccount.end();
-    console.log(chalk.magenta("\n[*] Dono bang!"));
+    console.log(chalk.magenta("\n[*] Finished!"));
     console.log(
-      chalk.green(`[*] Account dono ${successful} dari ${count} akun`)
+      chalk.green(`[*] Successfully created ${successful} of ${count} accounts`)
     );
     console.log(chalk.magenta("[*] Result in accounts.txt"));
     rl.close();

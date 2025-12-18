@@ -22,7 +22,7 @@ export function logMessage(
 ): void {
   const now = new Date();
   const timestamp = now
-    .toLocaleString("id-ID", {
+    .toLocaleString("en-US", {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
