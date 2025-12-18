@@ -127,7 +127,7 @@ export async function solveTurnstileCaptchaPuppeter() {
     if (cfTurnstileResponseValue) {
       return cfTurnstileResponseValue;
     } else {
-      console.log("Gagal mendapatkan token");
+      console.log("Failed to get token");
       return null;
     }
   } catch (error) {

@@ -218,26 +218,28 @@ export class sosoValuRefferal {
           });
 
           for await (const message of messages) {
-            if (message.envelope.to && message.envelope.to.some((to) => to.address === email)) {
-              const emailSource = message.source.toString();
-              const parsedEmail = await simpleParser(emailSource);
-              const verificationCode = this.extractVerificationCode(parsedEmail.text);
+            if (message.envelope && message.envelope.to && message.envelope.to.some((to) => to.address === email)) {
+              if (message.source) {
+                const emailSource = message.source.toString();
+                const parsedEmail = await simpleParser(emailSource);
+                const verificationCode = this.extractVerificationCode(parsedEmail.text);
 
-              if (verificationCode) {
-                logMessage(
-                  this.currentNum,
-                  this.total,
-                  `Verification code found: ${verificationCode}`,
-                  "success"
-                );
-                return verificationCode;
-              } else {
-                logMessage(
-                  this.currentNum,
-                  this.total,
-                  "No verification code found in the email body.",
-                  "warning"
-                );
+                if (verificationCode) {
+                  logMessage(
+                    this.currentNum,
+                    this.total,
+                    `Verification code found: ${verificationCode}`,
+                    "success"
+                  );
+                  return verificationCode;
+                } else {
+                  logMessage(
+                    this.currentNum,
+                    this.total,
+                    "No verification code found in the email body.",
+                    "warning"
+                  );
+                }
               }
             }
           }
@@ -351,4 +353,108 @@ export class sosoValuRefferal {
     }
   }
 
+  async login(email: string, password: string): Promise<string | null> {
+    logMessage(this.currentNum, this.total, "Logging in...", "process");
+
+    const loginData = {
+      email: email,
+      password: password,
+    };
+
+    const response = await this.makeRequest(
+      "POST",
+      "https://gw.sosovalue.com/usercenter/user/anno/login",
+      {
+        data: loginData,
+      }
+    );
+
+    if (response && response.data.code == 0) {
+      logMessage(this.currentNum, this.total, "Login successful", "success");
+      return response.data.data.token;
+    } else {
+      logMessage(this.currentNum, this.total, "Login failed", "error");
+      return null;
+    }
+  }
+
+  async getStarterTasks(token: string): Promise<any[] | null> {
+    logMessage(this.currentNum, this.total, "Getting starter tasks...", "process");
+
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    const response = await this.makeRequest(
+      "GET",
+      "https://gw.sosovalue.com/api/growth/task/list",
+      {
+        headers: headers,
+      }
+    );
+
+    if (response && response.data.code == 0) {
+      logMessage(this.currentNum, this.total, "Got starter tasks", "success");
+      return response.data.data;
+    } else {
+      logMessage(this.currentNum, this.total, "Failed to get starter tasks", "error");
+      return null;
+    }
+  }
+
+  async claimTaskReward(token: string, taskId: number): Promise<boolean> {
+    logMessage(this.currentNum, this.total, `Claiming reward for task ${taskId}...`, "process");
+
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    const data = {
+      taskId: taskId,
+    };
+
+    const response = await this.makeRequest(
+      "POST",
+      "https://gw.sosovalue.com/api/growth/task/claim",
+      {
+        headers: headers,
+        data: data,
+      }
+    );
+
+    if (response && response.data.code == 0) {
+      logMessage(this.currentNum, this.total, `Claimed reward for task ${taskId}`, "success");
+      return true;
+    } else {
+      logMessage(this.currentNum, this.total, `Failed to claim reward for task ${taskId}`, "error");
+      return false;
+    }
+  }
+
+  async performDailyCheckin(token: string): Promise<boolean> {
+    logMessage(this.currentNum, this.total, "Performing daily check-in...", "process");
+
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    const response = await this.makeRequest(
+      "POST",
+      "https://gw.sosovalue.com/api/growth/daily/check-in",
+      {
+        headers: headers,
+      }
+    );
+
+    if (response && response.data.code == 0) {
+      logMessage(this.currentNum, this.total, "Daily check-in successful", "success");
+      return true;
+    } else if (response && response.data.code == 1001) {
+      logMessage(this.currentNum, this.total, "Daily check-in already completed", "warning");
+      return true;
+    } else {
+      logMessage(this.currentNum, this.total, "Daily check-in failed", "error");
+      return false;
+    }
+  }
 }
