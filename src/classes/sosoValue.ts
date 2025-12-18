@@ -430,4 +430,31 @@ export class sosoValuRefferal {
       return false;
     }
   }
+
+  async performDailyCheckin(token: string): Promise<boolean> {
+    logMessage(this.currentNum, this.total, "Performing daily check-in...", "process");
+
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    const response = await this.makeRequest(
+      "POST",
+      "https://gw.sosovalue.com/api/growth/daily/check-in",
+      {
+        headers: headers,
+      }
+    );
+
+    if (response && response.data.code == 0) {
+      logMessage(this.currentNum, this.total, "Daily check-in successful", "success");
+      return true;
+    } else if (response && response.data.code == 1001) {
+      logMessage(this.currentNum, this.total, "Daily check-in already completed", "warning");
+      return true;
+    } else {
+      logMessage(this.currentNum, this.total, "Daily check-in failed", "error");
+      return false;
+    }
+  }
 }
