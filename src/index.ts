@@ -47,6 +47,17 @@ async function main(): Promise<void> {
           sosoValueaccount.write(`Password : ${password.password}\n`);
           sosoValueaccount.write(`Invitation Code : ${registered.invitationCode}\n`);
           sosoValueaccount.write(`===================================================================\n`);
+
+          const token = await sosoValue.login(email, password.encodedPassword);
+          if (token) {
+            const tasks = await sosoValue.getStarterTasks(token);
+            if (tasks) {
+              for (const task of tasks) {
+                await sosoValue.claimTaskReward(token, task.id);
+              }
+            }
+          }
+
           successful++;
           attempt = 1;
         } else {
