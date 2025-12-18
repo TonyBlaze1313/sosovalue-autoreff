@@ -9,8 +9,28 @@ export class EmailGenerator {
       const randomString = Math.random().toString(36).substring(2, 8);
       return `${username}+${randomString}@${domain}`;
     }
+
+    generateDotVariations() {
+      const [username, domain] = this.baseEmail.split("@");
+      if (username.length < 2) {
+        return this.baseEmail;
+      }
+      let newUsername = "";
+      for (let i = 0; i < username.length; i++) {
+        newUsername += username[i];
+        if (i < username.length - 1 && Math.random() < 0.5) {
+          newUsername += ".";
+        }
+      }
+      return `${newUsername.replace(/\.+/g, ".")}@${domain}`;
+    }
+
     generateRandomVariation() {
-      return this.generatePlusVariations();
+      if (Math.random() < 0.5) {
+        return this.generatePlusVariations();
+      } else {
+        return this.generateDotVariations();
+      }
     }
   }
 
